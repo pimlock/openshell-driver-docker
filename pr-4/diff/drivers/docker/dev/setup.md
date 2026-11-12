@@ -1,0 +1,140 @@
+---
+title: Docker Driver
+description: Run OpenShell sandboxes as containers on a local or remote Docker daemon.
+url: /openshell-driver-docker/pr-4/diff/drivers/docker/dev/setup/
+docset: driver-docker
+version: dev
+latest_version: 0.2.0
+source: "pimlock/openshell-driver-docker@PR #4, 147343b:docs/setup.mdx"
+---
+
+> Documentation index: /openshell-driver-docker/pr-4/diff/drivers/docker/dev/llms.txt. This page is for Docker driver dev.
+> Preview build of pimlock/openshell-driver-docker (PR #4, 147343b); not published. Published version (0.2.0): https://pimlock.github.io/openshell-docs/drivers/docker/0.2.0/setup.md
+
+# Docker Driver
+
+[Docker](https://www.docker.com/get-started/) runs sandboxes as containers on the Docker daemon host. The gateway accesses the daemon through its configured Unix socket.
+
+```toml
+[openshell.gateway]
+compute_driver = "docker"
+
+[openshell.drivers.docker]
+socket_path = "/var/run/docker.sock"
+```
+
+Common options in `[openshell.drivers.docker]` are `socket_path`, `grpc_endpoint`, `supervisor_network_mode`, `host_gateway_ip`, `sandbox_runtime_image`, `supervisor_image`, `image_pull_policy`, and `sandbox_pids_limit`. When `socket_path` is unset, the driver uses the socket found by auto-detection.
+
+```toml
+[openshell.gateway]
+compute_driver = "docker"
+
+[openshell.drivers.docker]
+socket_path = "/var/run/docker.sock"
+supervisor_network_mode = "bridge"
+```
+
+Common options in `[openshell.drivers.docker]`:
+
+- `socket_path`: the Docker socket. When unset, the driver uses the socket found by auto-detection.
+- `grpc_endpoint`: how sandboxes reach the gateway.
+- `supervisor_network_mode`: `host`, `bridge`, or `auto`.
+- `sandbox_runtime_image` and `supervisor_image`: override the default images.
+- `image_pull_policy` and `sandbox_pids_limit`.
+
+`supervisor_network_mode` defaults to `host`. Set `bridge` to use Docker bridge networking; `auto` also selects host. The workload always retains `network=none`.
+
+> **Note:** On Docker Desktop for macOS, prefer `bridge`. Host networking there applies to the Desktop VM, not to your Mac.
+
+Host mode on Docker Desktop requires host networking enabled. Bridge mode automatically uses `host.docker.internal` for a gateway on the Desktop host. On native Linux, the gateway and host services must listen on bridge-reachable addresses. Set `grpc_endpoint` for remote gateways, remapped published ports, or other custom layouts. Endpoint selection preserves TLS verification and does not change the gateway's listener. See [Docker configuration](https://pimlock.github.io/openshell-docs/dev/how-it-works/gateways/configuration/#docker).
+
+OpenShell discovers Docker's host address automatically in bridge mode. Set `host_gateway_ip` only to override discovery.
+
+The sandbox must pass its Landlock and seccomp qualification in either network mode. For GPU sandboxes, configure Docker CDI before starting the gateway.
+
+## Choose a Socket
+
+**Linux**
+
+The system daemon listens on `/var/run/docker.sock`. For rootless Docker, use
+`$XDG_RUNTIME_DIR/docker.sock` instead.
+
+**Docker Desktop**
+
+Docker Desktop links its socket to `/var/run/docker.sock` when the "Allow the
+default Docker socket" setting is on. Otherwise use `~/.docker/run/docker.sock`.
+
+## Corporate Proxy Egress
+
+For proxy-required networks, the Docker driver accepts `https_proxy`,
+`no_proxy`, `proxy_auth_file`, `proxy_auth_allow_insecure`,
+`proxy_connect_by_hostname`, and `proxy_ca_bundle`. The companion supervisor
+chains policy-approved TLS tunnels through the proxy with HTTP CONNECT.
+
+`proxy_ca_bundle` is an operator-owned gateway-host PEM path. Docker validates
+and copies the bundle into its supervisor-only named volume, so this also works
+with remote Docker daemons and does not expose the host path to the workload.
+The supervisor uses the bundle for an HTTPS proxy connection and for upstream
+certificates re-signed by a TLS-intercepting proxy. Workload processes receive
+the same corporate roots through their generated combined trust bundle.
+
+Sandbox environment, image contents, and `template.driver_config.docker`
+cannot alter these settings. Invalid proxy relationships or CA files prevent
+the gateway or sandbox from starting and never degrade to direct egress. See
+the [Gateway Configuration File](https://pimlock.github.io/openshell-docs/dev/how-it-works/gateways/configuration/) for URL,
+authentication, `NO_PROXY`, hostname CONNECT, and CA validation details.
+
+## Mounts
+
+Mount existing named volumes or `tmpfs` through driver config. Label volumes so resource admission accepts them:
+
+```shell
+docker volume create --label openshell.ai/sandbox-attachable=true \
+  --label openshell.ai/sandbox-attachable-workspace=default openshell-work
+
+openshell sandbox create \
+  --from registry.example.com/team/claude-code:1.0 \
+  --driver-config-json '{"docker":{"mounts":[{"type":"volume","source":"openshell-work","target":"/sandbox/work","read_only":false}]}}' \
+  -- claude
+```
+
+| Type     | Fields                                                                                                    |
+| -------- | --------------------------------------------------------------------------------------------------------- |
+| `volume` | `source`, `target`, optional `read_only` (default `true`), optional `subpath`.                            |
+| `tmpfs`  | `target`, optional `options`, `size_bytes`, `mode`.                                                       |
+| `bind`   | `source` (absolute host path), `target`, optional `read_only` (default `true`), optional `selinux_label`. |
+
+| Type     | Fields                                                                                                    |
+| -------- | --------------------------------------------------------------------------------------------------------- |
+| `volume` | `source`, `target`, optional `read_only` (default `true`), optional `subpath`.                            |
+| `tmpfs`  | `target`, optional `options`, `size_bytes`, `mode` (default `1777`).                                      |
+| `bind`   | `source` (absolute host path), `target`, optional `read_only` (default `true`), optional `selinux_label`. |
+
+> **Warning:** Bind mounts expose gateway-host files to the sandbox and can bypass workspace isolation and filesystem policy. They require `enable_bind_mounts = true` and disabling resource admission for the driver:
+>
+> Bind mounts expose gateway-host files to the sandbox and bypass workspace isolation and filesystem policy. Use them only for trusted workloads. They require `enable_bind_mounts = true` and disabling resource admission for the driver:
+>
+> ```toml
+> [openshell.drivers.docker]
+> allow_driver_config = true
+> enable_bind_mounts = true
+>
+> [openshell.drivers.docker.resource_admission]
+> enabled = false
+> ```
+
+Mount targets cannot replace the workspace root, the container root, or OpenShell paths under `/opt/openshell`, `/etc/openshell`, and `/run/openshell`.
+
+## Troubleshooting
+
+### Sandbox Can't Reach the Gateway
+
+On native Linux, the gateway must listen on an address the Docker bridge can
+reach. Check `grpc_endpoint` in the [Docker configuration](https://pimlock.github.io/openshell-docs/dev/how-it-works/gateways/configuration/#docker)
+and confirm the port is published.
+
+### Proxy Settings Are Ignored
+
+Proxy settings come only from the gateway TOML file. Sandbox environment
+variables and `template.driver_config.docker` can't change them. See
+[Corporate Proxy Egress](#corporate-proxy-egress).

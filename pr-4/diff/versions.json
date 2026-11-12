@@ -1,0 +1,21 @@
+{
+  "base": "/openshell-driver-docker/pr-4/diff/",
+  "home": "/openshell-driver-docker/pr-4/diff/drivers/docker/dev/setup/",
+  "docsets": {
+    "driver-docker": {
+      "mount": "drivers/docker",
+      "latest": "dev",
+      "versions": [
+        {
+          "name": "dev",
+          "prefix": "drivers/docker/dev",
+          "first": "drivers/docker/dev/setup",
+          "pages": [
+            "setup",
+            "upgrade"
+          ]
+        }
+      ]
+    }
+  }
+}
