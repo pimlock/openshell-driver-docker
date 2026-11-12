@@ -1,0 +1,16 @@
+---
+title: Troubleshooting
+description: Diagnose common Docker driver problems.
+---
+
+## Sandbox Can't Reach the Gateway
+
+On native Linux, the gateway must listen on an address the Docker bridge can
+reach. Check `grpc_endpoint` in the [Docker configuration](core://how-it-works/gateways/configuration#docker)
+and confirm the port is published.
+
+## Proxy Settings Are Ignored
+
+Proxy settings come only from the gateway TOML file. Sandbox environment
+variables and `template.driver_config.docker` can't change them. See
+[Corporate Proxy Egress](setup#corporate-proxy-egress).
