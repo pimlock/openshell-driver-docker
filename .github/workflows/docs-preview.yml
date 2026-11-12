@@ -16,6 +16,7 @@ jobs:
     uses: pimlock/openshell-docs/.github/workflows/preview.yml@main
     with:
       docset: driver-docker
+      layout: fragment
     permissions:
       contents: write
       pull-requests: write
