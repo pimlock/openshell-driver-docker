@@ -1,6 +1,6 @@
 # OpenShell
 
-> Preview of Docker driver from pimlock/openshell-driver-docker (PR #1, b82bfdd). Only this docset is built here; the rest is at https://pimlock.github.io/openshell-docs/llms.txt.
+> Preview of Docker driver from pimlock/openshell-driver-docker (PR #1, 027e246). Only this docset is built here; the rest is at https://pimlock.github.io/openshell-docs/llms.txt.
 
 - [Docker Driver](/openshell-driver-docker/pr-1/drivers/docker/dev/setup.md): Run OpenShell sandboxes as containers on a Docker daemon.
 - [Troubleshooting](/openshell-driver-docker/pr-1/drivers/docker/dev/troubleshooting.md): Diagnose common Docker driver problems.

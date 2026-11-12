@@ -5,11 +5,11 @@ url: /openshell-driver-docker/pr-1/drivers/docker/dev/setup/
 docset: driver-docker
 version: dev
 latest_version: 0.2.0
-source: "pimlock/openshell-driver-docker@PR #1, b82bfdd:docs/setup.mdx"
+source: "pimlock/openshell-driver-docker@PR #1, 027e246:docs/setup.mdx"
 ---
 
 > Documentation index: /openshell-driver-docker/pr-1/drivers/docker/dev/llms.txt. This page is for Docker driver dev.
-> Preview build of pimlock/openshell-driver-docker (PR #1, b82bfdd); not published. Published version (0.2.0): https://pimlock.github.io/openshell-docs/drivers/docker/0.2.0/setup.md
+> Preview build of pimlock/openshell-driver-docker (PR #1, 027e246); not published. Published version (0.2.0): https://pimlock.github.io/openshell-docs/drivers/docker/0.2.0/setup.md
 
 # Docker Driver
 
