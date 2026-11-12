@@ -2,12 +2,13 @@
 # request gets its own preview at https://pimlock.github.io/openshell-driver-docker/pr-<n>/
 # (gh-pages branch) and one comment with the link; closing the pull request
 # removes it. Links into other repos are checked against the live site's
-# link index; see pimlock/openshell-docs.
+# link index; see pimlock/openshell-docs. Add the `docs-diff` label to also
+# build a view that marks what changed on each page (experimental).
 name: Docs preview
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, closed]
+    types: [opened, synchronize, reopened, closed, labeled, unlabeled]
     paths: [docs/**]
   workflow_dispatch:
 
