@@ -3,4 +3,6 @@ title: Docker driver
 description: Sandboxes as containers on a local or remote Docker daemon.
 nav:
   - page: setup.mdx
-  - page: troubleshooting.mdx
+  - page: upgrade.mdx
+redirects:
+  troubleshooting.mdx: setup.mdx
