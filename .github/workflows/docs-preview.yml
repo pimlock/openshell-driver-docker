@@ -1,10 +1,13 @@
-# Build a preview of this repo's docs with the shared site theme and publish it
-# to this repo's GitHub Pages. Links into other repos are checked against the
-# live site's link index; see pimlock/openshell-docs.
+# Build a preview of this repo's docs with the shared site theme. Each pull
+# request gets its own preview at https://pimlock.github.io/openshell-driver-docker/pr-<n>/
+# (gh-pages branch) and one comment with the link; closing the pull request
+# removes it. Links into other repos are checked against the live site's
+# link index; see pimlock/openshell-docs.
 name: Docs preview
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, closed]
     paths: [docs/**]
   workflow_dispatch:
 
@@ -14,6 +17,5 @@ jobs:
     with:
       docset: driver-docker
     permissions:
-      contents: read
-      pages: write
-      id-token: write
+      contents: write
+      pull-requests: write
