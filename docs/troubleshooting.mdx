@@ -14,3 +14,9 @@ and confirm the port is published.
 Proxy settings come only from the gateway TOML file. Sandbox environment
 variables and `template.driver_config.docker` can't change them. See
 [Corporate Proxy Egress](setup#corporate-proxy-egress).
+
+## Find Sandbox Logs
+
+Supervisor and workload logs stay with the container. Read them with
+`docker logs <container>`, or through the gateway as described in
+[Accessing Logs](core://observability/accessing-logs).
