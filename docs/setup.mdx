@@ -1,0 +1,64 @@
+---
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+title: "Docker Driver"
+sidebar-title: "Setup"
+description: "Run OpenShell sandboxes as containers on a Docker daemon."
+---
+
+[Docker](https://www.docker.com/get-started/) runs sandboxes as containers on the Docker daemon host. The gateway accesses the daemon through its configured Unix socket.
+
+```toml
+[openshell.gateway]
+compute_driver = "docker"
+
+[openshell.drivers.docker]
+socket_path = "/var/run/docker.sock"
+```
+
+Common options in `[openshell.drivers.docker]` are `socket_path`, `grpc_endpoint`, `supervisor_network_mode`, `host_gateway_ip`, `sandbox_runtime_image`, `supervisor_image`, `image_pull_policy`, and `sandbox_pids_limit`. When `socket_path` is unset, the driver uses the socket found by auto-detection.
+
+`supervisor_network_mode` defaults to `host`. Set `bridge` to use Docker bridge networking; `auto` also selects host. The workload always retains `network=none`.
+
+Host mode on Docker Desktop requires host networking enabled. Bridge mode automatically uses `host.docker.internal` for a gateway on the Desktop host. On native Linux, the gateway and host services must listen on bridge-reachable addresses. Set `grpc_endpoint` for remote gateways, remapped published ports, or other custom layouts. Endpoint selection preserves TLS verification and does not change the gateway's listener. See [Docker configuration](core://how-it-works/gateways/configuration#docker).
+
+OpenShell discovers Docker's host address automatically in bridge mode. Set `host_gateway_ip` only to override discovery.
+
+The sandbox must pass its Landlock and seccomp qualification in either network mode. For GPU sandboxes, configure Docker CDI before starting the gateway.
+
+## Mounts
+
+Mount existing named volumes or `tmpfs` through driver config. Label volumes so resource admission accepts them:
+
+```shell
+docker volume create --label openshell.ai/sandbox-attachable=true \
+  --label openshell.ai/sandbox-attachable-workspace=default openshell-work
+
+openshell sandbox create \
+  --from registry.example.com/team/claude-code:1.0 \
+  --driver-config-json '{"docker":{"mounts":[{"type":"volume","source":"openshell-work","target":"/sandbox/work","read_only":false}]}}' \
+  -- claude
+```
+
+| Type | Fields |
+|---|---|
+| `volume` | `source`, `target`, optional `read_only` (default `true`), optional `subpath`. |
+| `tmpfs` | `target`, optional `options`, `size_bytes`, `mode`. |
+| `bind` | `source` (absolute host path), `target`, optional `read_only` (default `true`), optional `selinux_label`. |
+
+<Warning>
+Bind mounts expose gateway-host files to the sandbox and can bypass workspace isolation and filesystem policy. They require `enable_bind_mounts = true` and disabling resource admission for the driver:
+
+```toml
+[openshell.drivers.docker]
+allow_driver_config = true
+enable_bind_mounts = true
+
+[openshell.drivers.docker.resource_admission]
+enabled = false
+```
+
+</Warning>
+
+Mount targets cannot replace the workspace root, the container root, or OpenShell paths under `/opt/openshell`, `/etc/openshell`, and `/run/openshell`.
+
