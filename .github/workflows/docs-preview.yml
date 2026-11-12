@@ -1,0 +1,19 @@
+# Build a preview of this repo's docs with the shared site theme and publish it
+# to this repo's GitHub Pages. Links into other repos are checked against the
+# live site's link index; see pimlock/openshell-docs.
+name: Docs preview
+
+on:
+  pull_request:
+    paths: [docs/**]
+  workflow_dispatch:
+
+jobs:
+  docs:
+    uses: pimlock/openshell-docs/.github/workflows/preview.yml@main
+    with:
+      docset: driver-docker
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
