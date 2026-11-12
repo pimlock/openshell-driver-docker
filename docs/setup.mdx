@@ -82,3 +82,9 @@ enabled = false
 
 Mount targets cannot replace the workspace root, the container root, or OpenShell paths under `/opt/openshell`, `/etc/openshell`, and `/run/openshell`.
 
+
+## Rootless Docker
+
+The driver also works with a rootless Docker daemon. Point the gateway at the
+rootless socket (usually `$XDG_RUNTIME_DIR/docker.sock`). Sandboxes keep the
+same isolation model; see [Sandboxes](core://how-it-works/sandboxes/overview).
