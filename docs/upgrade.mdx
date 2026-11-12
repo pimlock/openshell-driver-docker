@@ -1,0 +1,29 @@
+---
+title: Upgrade the Driver
+sidebar-title: Upgrade
+description: Move a gateway to a new Docker driver release without losing sandboxes.
+---
+
+Sandboxes keep running while you upgrade. The gateway reconnects to them when it
+starts again.
+
+<Steps>
+
+## Check the Release Notes
+
+Read the notes for every release between your version and the new one. Look
+for changed defaults in `[openshell.drivers.docker]`.
+
+## Pull the New Images
+
+```shell
+docker pull ghcr.io/nvidia/openshell/supervisor:latest
+```
+
+## Restart the Gateway
+
+Restart the gateway with the new version. See
+[Gateway Configuration](core://how-it-works/gateways/configuration) for where the
+driver settings live.
+
+</Steps>

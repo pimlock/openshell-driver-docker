@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 title: "Docker Driver"
 sidebar-title: "Setup"
-description: "Run OpenShell sandboxes as containers on a Docker daemon."
+description: "Run OpenShell sandboxes as containers on a local or remote Docker daemon."
 ---
 
 [Docker](https://www.docker.com/get-started/) runs sandboxes as containers on the Docker daemon host. The gateway accesses the daemon through its configured Unix socket.
@@ -14,17 +14,39 @@ compute_driver = "docker"
 
 [openshell.drivers.docker]
 socket_path = "/var/run/docker.sock"
+supervisor_network_mode = "bridge"
 ```
 
-Common options in `[openshell.drivers.docker]` are `socket_path`, `grpc_endpoint`, `supervisor_network_mode`, `host_gateway_ip`, `sandbox_runtime_image`, `supervisor_image`, `image_pull_policy`, and `sandbox_pids_limit`. When `socket_path` is unset, the driver uses the socket found by auto-detection.
+Common options in `[openshell.drivers.docker]`:
+
+- `socket_path`: the Docker socket. When unset, the driver uses the socket found by auto-detection.
+- `grpc_endpoint`: how sandboxes reach the gateway.
+- `supervisor_network_mode`: `host`, `bridge`, or `auto`.
+- `sandbox_runtime_image` and `supervisor_image`: override the default images.
+- `image_pull_policy` and `sandbox_pids_limit`.
 
 `supervisor_network_mode` defaults to `host`. Set `bridge` to use Docker bridge networking; `auto` also selects host. The workload always retains `network=none`.
 
+<Note>
+On Docker Desktop for macOS, prefer `bridge`. Host networking there applies to the Desktop VM, not to your Mac.
+</Note>
+
 Host mode on Docker Desktop requires host networking enabled. Bridge mode automatically uses `host.docker.internal` for a gateway on the Desktop host. On native Linux, the gateway and host services must listen on bridge-reachable addresses. Set `grpc_endpoint` for remote gateways, remapped published ports, or other custom layouts. Endpoint selection preserves TLS verification and does not change the gateway's listener. See [Docker configuration](core://how-it-works/gateways/configuration#docker).
 
-OpenShell discovers Docker's host address automatically in bridge mode. Set `host_gateway_ip` only to override discovery.
-
 The sandbox must pass its Landlock and seccomp qualification in either network mode. For GPU sandboxes, configure Docker CDI before starting the gateway.
+
+## Choose a Socket
+
+<Tabs>
+<Tab title="Linux">
+The system daemon listens on `/var/run/docker.sock`. For rootless Docker, use
+`$XDG_RUNTIME_DIR/docker.sock` instead.
+</Tab>
+<Tab title="Docker Desktop">
+Docker Desktop links its socket to `/var/run/docker.sock` when the "Allow the
+default Docker socket" setting is on. Otherwise use `~/.docker/run/docker.sock`.
+</Tab>
+</Tabs>
 
 ## Corporate Proxy Egress
 
@@ -63,11 +85,11 @@ openshell sandbox create \
 | Type | Fields |
 |---|---|
 | `volume` | `source`, `target`, optional `read_only` (default `true`), optional `subpath`. |
-| `tmpfs` | `target`, optional `options`, `size_bytes`, `mode`. |
+| `tmpfs` | `target`, optional `options`, `size_bytes`, `mode` (default `1777`). |
 | `bind` | `source` (absolute host path), `target`, optional `read_only` (default `true`), optional `selinux_label`. |
 
 <Warning>
-Bind mounts expose gateway-host files to the sandbox and can bypass workspace isolation and filesystem policy. They require `enable_bind_mounts = true` and disabling resource admission for the driver:
+Bind mounts expose gateway-host files to the sandbox and bypass workspace isolation and filesystem policy. Use them only for trusted workloads. They require `enable_bind_mounts = true` and disabling resource admission for the driver:
 
 ```toml
 [openshell.drivers.docker]
@@ -82,3 +104,16 @@ enabled = false
 
 Mount targets cannot replace the workspace root, the container root, or OpenShell paths under `/opt/openshell`, `/etc/openshell`, and `/run/openshell`.
 
+## Troubleshooting
+
+### Sandbox Can't Reach the Gateway
+
+On native Linux, the gateway must listen on an address the Docker bridge can
+reach. Check `grpc_endpoint` in the [Docker configuration](core://how-it-works/gateways/configuration#docker)
+and confirm the port is published.
+
+### Proxy Settings Are Ignored
+
+Proxy settings come only from the gateway TOML file. Sandbox environment
+variables and `template.driver_config.docker` can't change them. See
+[Corporate Proxy Egress](#corporate-proxy-egress).
