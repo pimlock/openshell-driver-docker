@@ -23,8 +23,6 @@ compute_driver = "docker"
 socket_path = "/var/run/docker.sock"
 ```
 
-Common options in `[openshell.drivers.docker]` are `socket_path`, `grpc_endpoint`, `supervisor_network_mode`, `host_gateway_ip`, `sandbox_runtime_image`, `supervisor_image`, `image_pull_policy`, and `sandbox_pids_limit`. When `socket_path` is unset, the driver uses the socket found by auto-detection.
-
 ```toml
 [openshell.gateway]
 compute_driver = "docker"
@@ -33,6 +31,8 @@ compute_driver = "docker"
 socket_path = "/var/run/docker.sock"
 supervisor_network_mode = "bridge"
 ```
+
+Common options in `[openshell.drivers.docker]` are `socket_path`, `grpc_endpoint`, `supervisor_network_mode`, `host_gateway_ip`, `sandbox_runtime_image`, `supervisor_image`, `image_pull_policy`, and `sandbox_pids_limit`. When `socket_path` is unset, the driver uses the socket found by auto-detection.
 
 Common options in `[openshell.drivers.docker]`:
 

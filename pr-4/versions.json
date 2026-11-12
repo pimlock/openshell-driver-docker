@@ -13,7 +13,10 @@
           "pages": [
             "setup",
             "upgrade"
-          ]
+          ],
+          "redirects": {
+            "troubleshooting": "setup"
+          }
         }
       ]
     }
