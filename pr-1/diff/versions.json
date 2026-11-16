@@ -13,7 +13,8 @@
           "pages": [
             "setup",
             "troubleshooting"
-          ]
+          ],
+          "redirects": {}
         }
       ]
     }
