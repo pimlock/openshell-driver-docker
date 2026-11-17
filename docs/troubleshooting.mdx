@@ -7,7 +7,14 @@ description: Diagnose common Docker driver problems.
 
 On native Linux, the gateway must listen on an address the Docker bridge can
 reach. Check `grpc_endpoint` in the [Docker configuration](core://how-it-works/gateways/configuration#docker)
-and confirm the port is published.
+and confirm the port is published. On Docker Desktop, use
+`host.docker.internal` instead of a bridge address.
+
+## Sandbox Image Pull Fails
+
+The gateway pulls sandbox images through the Docker daemon, so the daemon's
+registry credentials and proxy settings apply. Run `docker pull <image>` on the
+gateway host to see the daemon's error, then fix its configuration and retry.
 
 ## Proxy Settings Are Ignored
 
