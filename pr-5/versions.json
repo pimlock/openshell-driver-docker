@@ -12,6 +12,7 @@
           "first": "drivers/docker/dev/setup",
           "pages": [
             "setup",
+            "images",
             "troubleshooting"
           ],
           "redirects": {}
