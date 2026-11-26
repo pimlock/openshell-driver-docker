@@ -1,21 +1,19 @@
-# Docs preview, step 1 of 3: build this pull request's docs with the shared
-# site theme. Runs with the pull request's code (forks included), so it gets
-# a read-only token and no secrets. "Docs preview publish" publishes the
-# result to https://pimlock.github.io/openshell-driver-docker/pr-<n>/.
-# See pimlock/openshell-docs/.github/workflows/preview-build.yml.
 name: Docs preview
-
 on:
   pull_request:
     paths: [docs/**]
-
 permissions: {}
-
 jobs:
   build:
-    uses: pimlock/openshell-docs/.github/workflows/preview-build.yml@b35bd7cc44549555483097b6c749f23e9d8be347
-    with:
-      docset: driver-docker
-      site-ref: b35bd7cc44549555483097b6c749f23e9d8be347
+    runs-on: ubuntu-latest
     permissions:
       contents: read
+    steps:
+      - run: |
+          mkdir -p meta site
+          echo '{"pr": 6, "head_sha": "x", "docset": "driver-docker"}' > meta/meta.json
+          echo '<h1>Spoofed preview</h1>' > site/index.html
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with: {name: docs-preview-site, path: site}
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with: {name: docs-preview-meta, path: meta/meta.json}
