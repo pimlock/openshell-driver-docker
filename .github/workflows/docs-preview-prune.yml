@@ -1,0 +1,23 @@
+# Docs previews: daily cleanup. Removes previews of pull requests that are no
+# longer open (in case the close workflow missed one) and previews published
+# more than 30 days ago (the next push publishes them again). gh-pages stays
+# a single commit.
+# See pimlock/openshell-docs/.github/workflows/preview-prune.yml.
+name: Docs preview prune
+
+on:
+  schedule:
+    - cron: "23 4 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  prune:
+    uses: pimlock/openshell-docs/.github/workflows/preview-prune.yml@801f0fce8b2ba3f01907d60dbacc0ae9e8bfeefd
+    with:
+      site-ref: 801f0fce8b2ba3f01907d60dbacc0ae9e8bfeefd
+      max-age-days: 30
+    permissions:
+      contents: write
+      pull-requests: read
