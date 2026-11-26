@@ -1,22 +1,21 @@
-# Build a preview of this repo's docs with the shared site theme. Each pull
-# request gets its own preview at https://pimlock.github.io/openshell-driver-docker/pr-<n>/
-# (gh-pages branch) and one comment with the link; closing the pull request
-# removes it. Links into other repos are checked against the live site's
-# link index; see pimlock/openshell-docs. Add the `docs-diff` label to also
-# build a view that marks what changed on each page (experimental).
+# Docs preview, step 1 of 3: build this pull request's docs with the shared
+# site theme. Runs with the pull request's code (forks included), so it gets
+# a read-only token and no secrets. "Docs preview publish" publishes the
+# result to https://pimlock.github.io/openshell-driver-docker/pr-<n>/.
+# See pimlock/openshell-docs/.github/workflows/preview-build.yml.
 name: Docs preview
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, closed, labeled, unlabeled]
     paths: [docs/**]
-  workflow_dispatch:
+
+permissions: {}
 
 jobs:
-  docs:
-    uses: pimlock/openshell-docs/.github/workflows/preview.yml@main
+  build:
+    uses: pimlock/openshell-docs/.github/workflows/preview-build.yml@b35bd7cc44549555483097b6c749f23e9d8be347
     with:
       docset: driver-docker
+      site-ref: b35bd7cc44549555483097b6c749f23e9d8be347
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read

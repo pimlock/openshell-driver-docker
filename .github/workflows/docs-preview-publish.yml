@@ -1,0 +1,25 @@
+# Docs preview, step 2 of 3: publish a build from "Docs preview" to gh-pages
+# and report it on the pull request. Runs from main with write access, and
+# never runs the pull request's code. Previews of branches in this repo use
+# the docs-preview environment; previews of forks use docs-preview-fork,
+# which needs a maintainer's approval.
+# See pimlock/openshell-docs/.github/workflows/preview-publish.yml.
+name: Docs preview publish
+
+on:
+  workflow_run: # zizmor: ignore[dangerous-triggers] never runs PR code; artifacts are verified data
+    workflows: [Docs preview]
+    types: [completed]
+
+permissions: {}
+
+jobs:
+  publish:
+    uses: pimlock/openshell-docs/.github/workflows/preview-publish.yml@b35bd7cc44549555483097b6c749f23e9d8be347
+    with:
+      site-ref: b35bd7cc44549555483097b6c749f23e9d8be347
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+      statuses: write

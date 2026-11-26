@@ -1,0 +1,19 @@
+# Docs preview, step 3 of 3: remove a pull request's preview when it closes.
+# Never checks out the pull request.
+# See pimlock/openshell-docs/.github/workflows/preview-remove.yml.
+name: Docs preview close
+
+on:
+  pull_request_target: # zizmor: ignore[dangerous-triggers] never checks out the PR; only removes its preview
+    types: [closed]
+
+permissions: {}
+
+jobs:
+  remove:
+    uses: pimlock/openshell-docs/.github/workflows/preview-remove.yml@b35bd7cc44549555483097b6c749f23e9d8be347
+    with:
+      site-ref: b35bd7cc44549555483097b6c749f23e9d8be347
+    permissions:
+      contents: write
+      pull-requests: write
