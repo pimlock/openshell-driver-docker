@@ -13,9 +13,9 @@ permissions: {}
 
 jobs:
   build:
-    uses: pimlock/openshell-docs/.github/workflows/preview-build.yml@b35bd7cc44549555483097b6c749f23e9d8be347
+    uses: pimlock/openshell-docs/.github/workflows/preview-build.yml@801f0fce8b2ba3f01907d60dbacc0ae9e8bfeefd
     with:
       docset: driver-docker
-      site-ref: b35bd7cc44549555483097b6c749f23e9d8be347
+      site-ref: 801f0fce8b2ba3f01907d60dbacc0ae9e8bfeefd
     permissions:
       contents: read
