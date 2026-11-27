@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "docs:check": "openshell-docs check --docset driver-docker",
+    "docs:build": "openshell-docs build --docset driver-docker",
+    "docs:serve": "openshell-docs serve --docset driver-docker"
+  },
+  "devDependencies": {
+    "@pimlock/openshell-docs-build": "https://github.com/pimlock/openshell-docs/releases/download/v0.1.0/pimlock-openshell-docs-build-0.1.0.tgz"
+  }
+}

@@ -1,0 +1,22 @@
+# The docs build package (@pimlock/openshell-docs-build) and the workflows'
+# actions. Dependabot can update the package once it is on npmjs.org; a
+# release tarball URL (as now) is not updated. Our own package skips the
+# cooldown so docs build releases arrive the next day.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily
+    cooldown:
+      default-days: 7
+      exclude: ["@pimlock/openshell-docs-build"]
+    groups:
+      docs-build:
+        patterns: ["@pimlock/openshell-docs-build"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
