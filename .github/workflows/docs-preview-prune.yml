@@ -14,9 +14,9 @@ permissions: {}
 
 jobs:
   prune:
-    uses: pimlock/openshell-docs/.github/workflows/preview-prune.yml@801f0fce8b2ba3f01907d60dbacc0ae9e8bfeefd
+    uses: pimlock/openshell-docs/.github/workflows/preview-prune.yml@cedfa3b9dd941e4bbc6a7bfb2e9eef380e509f7a
     with:
-      site-ref: 801f0fce8b2ba3f01907d60dbacc0ae9e8bfeefd
+      site-ref: cedfa3b9dd941e4bbc6a7bfb2e9eef380e509f7a
       max-age-days: 30
     permissions:
       contents: write

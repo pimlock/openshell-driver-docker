@@ -1,0 +1,8 @@
+# Netlify builds this repo's docs, including deploy previews of pull requests,
+# with the same script as a local build.
+[build]
+  command = "scripts/docs.sh build"
+  publish = "build/docs"
+
+[build.environment]
+  NODE_VERSION = "24"
