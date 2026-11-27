@@ -11,20 +11,17 @@ fetches `docs/` from this repo's release tags at build time.
 
 ## Build the docs
 
-Needs git and Node.js 24.
+Needs Node.js 24.
 
 ```shell
-scripts/docs.sh build   # into build/docs/
-scripts/docs.sh serve   # build, then serve at http://127.0.0.1:4410/
+npm ci
+npm run docs:check   # check links only
+npm run docs:build   # build the site into build/docs/
+npm run docs:serve   # build, then serve at http://127.0.0.1:4410/
 ```
 
-The script fetches the website build pinned in `docs/website.env` once, into
-`.cache/docs-website/`, and builds only this repo's docs with it. Links to
-other repos' docs are checked against the live site. Netlify runs the same
-script (`netlify.toml`) for deploy previews.
-
-To try website changes, point the script at a checkout of the website repo:
-`WEBSITE_DIR=../openshell-docs scripts/docs.sh serve`.
-
-The GitHub Pages preview workflows pin the same website commit in their
-`uses:` lines; bump them together with `docs/website.env`.
+The build comes from the `@pimlock/openshell-docs-build` package, pinned in
+`package-lock.json`. It builds only this repo's docs; links to other repos'
+docs are checked against the live site, and so are their links into these
+docs. CI runs the same commands (`.github/workflows/docs.yml`), and Netlify
+runs `docs:build` for deploy previews (`netlify.toml`).

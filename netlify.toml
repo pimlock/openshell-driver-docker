@@ -1,7 +1,7 @@
 # Netlify builds this repo's docs, including deploy previews of pull requests,
-# with the same script as a local build.
+# with the same command as a local build. It installs package.json first.
 [build]
-  command = "scripts/docs.sh build"
+  command = "npm run docs:build"
   publish = "build/docs"
 
 [build.environment]
